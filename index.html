@@ -54,7 +54,7 @@
   const perPage=20;
   const totalVideos=100;
 
-  function signup(){document.getElementById('auth').classList.add('hidden');document.getElementById('home').classList.remove('hidden');loadMore()}
+  function signin(){document.getElementById('auth').classList.add('hidden');document.getElementById('home').classList.remove('hidden');loadMore()}
   function logout(){location.reload()}
 
   function openViewer(index){
@@ -66,8 +66,8 @@
 
     viewer.append(loader,timer);overlay.appendChild(viewer);document.body.appendChild(overlay);
 
-    let t=90;
-    const int=setInterval(()=>{t--;timer.textContent=`Watching… ${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+    let t=40;
+    const int=setInterval(()=>{t--;timer.textContent=`loading… ${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
       if(t<=0){clearInterval(int);overlay.remove();reward(index)}},1000)
   }
 
