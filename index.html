@@ -54,7 +54,7 @@
   const perPage=20;
   const totalVideos=100;
 
-  function sign(){document.getElementById('auth').classList.add('hidden');document.getElementById('home').classList.remove('hidden');loadMore()}
+  function signup(){document.getElementById('auth').classList.add('hidden');document.getElementById('home').classList.remove('hidden');loadMore()}
   function logout(){location.reload()}
 
   function openViewer(index){
@@ -74,7 +74,7 @@
   function reward(index){
     watched.add(index);
     localStorage.setItem('watched',JSON.stringify([...watched]));
-    balance+=0.5;
+    balance+=1545;
     document.getElementById('bal').textContent=balance.toFixed(2);
     document.querySelector(`[data-i="${index}"]`).classList.add('watched');
   }
