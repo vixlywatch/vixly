@@ -253,4 +253,56 @@ modal("Enter Amount",`
 
 function convert(){
 const usd=document.getElementById("usd").value||0;
-document.getElementById("ngn").text
+document.getElementById("ngn").textContent=`₦${(usd*RATE).toLocaleString()}`;
+}
+
+function processWithdraw(){
+const o=document.createElement("div");
+o.className="overlay";
+o.innerHTML=`<div class="modal"><div class="loader"></div><p>Processing withdrawal…</p></div>`;
+document.body.appendChild(o);
+
+setTimeout(()=>{
+o.innerHTML=`<div class="modal"><div class="check">✓</div><h3>Successful</h3><p>Your withdrawal is being processed.</p></div>`;
+},10000);
+}
+
+function modal(title,msg){
+const o=document.createElement("div");
+o.className="overlay";
+o.innerHTML=`<div class="modal"><h3>${title}</h3>${msg}<br><br><button class="btn alt" onclick="this.closest('.overlay').remove()">Close</button></div>`;
+document.body.appendChild(o);
+}
+</script>
+
+<header>
+<h1>Vixly</h1>
+<button class="btn" onclick="logout()">Logout</button>
+</header>
+
+<section id="auth" class="container">
+<div class="card">
+<h2>Create Account</h2>
+<input placeholder="Username">
+<input type="password" placeholder="Password">
+<button class="btn" style="width:100%" onclick="signup()">Sign Up</button>
+</div>
+</section>
+
+<section id="home" class="container hidden">
+<div class="wallet">
+<div>
+<h2>$<span id="bal">0.00</span></h2>
+<div>Wallet Balance</div>
+</div>
+<div>
+<div><strong>Agency code:</strong> 2k6fund</div>
+<button class="btn" onclick="withdraw()">Withdraw</button>
+</div>
+</div>
+
+<div class="video-grid" id="videoGrid"></div>
+</section>
+
+</body>
+</html>
