@@ -69,7 +69,7 @@ z-index:100
 background:#0b1410;
 padding:25px;
 border-radius:14px;
-max-width:340px;
+max-width:360px;
 width:100%;
 text-align:center
 }
@@ -91,13 +91,22 @@ animation:spin 1s linear infinite;
 margin:20px auto
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.check{
+width:70px;height:70px;
+border-radius:50%;
+background:#00ff8c;
+display:flex;align-items:center;justify-content:center;
+font-size:36px;color:#042b1a;
+animation:pop .5s ease
+}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 </style>
 </head>
 
 <body>
 
 <script>
-// floating $
 for(let i=0;i<25;i++){
   const d=document.createElement("div");
   d.className="dollar";
@@ -108,15 +117,15 @@ for(let i=0;i<25;i++){
   document.body.appendChild(d);
 }
 
-// persistent login
 if(localStorage.getItem("vixlyUser")){
   window.onload=()=>{auth.classList.add("hidden");home.classList.remove("hidden");loadVideos()}
 }
 
-// wallet
 let balance=parseFloat(localStorage.getItem("balance")||"0");
+const RATE=1500;
 
-// daily limit
+let bank=JSON.parse(localStorage.getItem("bank")||"null");
+
 const DAILY_LIMIT=20;
 let today=new Date().toDateString();
 let daily=JSON.parse(localStorage.getItem("daily")||"{}");
@@ -125,10 +134,6 @@ if(daily.date!==today){
   localStorage.setItem("daily",JSON.stringify(daily));
 }
 
-// bank storage
-let bank=JSON.parse(localStorage.getItem("bank")||"null");
-
-// titles
 const titles=[
 "How Money Really Works","Side Hustles That Pay",
 "Secrets of Online Income","Why Most People Stay Broke",
@@ -136,7 +141,6 @@ const titles=[
 "How Digital Money Is Made","Financial Habits of Winners"
 ];
 
-// shuffle
 const videos=[...Array(100).keys()].sort(()=>Math.random()-.5);
 let watchedSession=new Set();
 
@@ -203,7 +207,6 @@ document.getElementById("bal").textContent=balance.toFixed(2);
 el.classList.add("watched");
 }
 
-// withdrawal flow
 function withdraw(){
 modal("Choose withdrawal method",`
 <button class="btn" onclick="bankForm()">Add Bank</button><br><br>
@@ -222,7 +225,7 @@ modal("Bank Details",`
 </select>
 <input id="acctNum" placeholder="Account Number">
 <input id="acctName" placeholder="Account Holder Name">
-<button class="btn" onclick="saveBank()">Save Bank</button>
+<button class="btn" onclick="saveBank()">Save & Continue</button>
 `);
 }
 
@@ -233,58 +236,21 @@ number:acctNum.value,
 holder:acctName.value
 };
 localStorage.setItem("bank",JSON.stringify(bank));
-confirmWithdraw();
+amountForm();
 }
 
-function confirmWithdraw(){
+function amountForm(){
 if(balance<500){
 modal("Withdrawal Error","Minimum withdrawal amount is $500");
 return;
 }
-modal("Withdrawal Submitted",`
-<p>Bank: ${bank.name}</p>
-<p>Account: ${bank.number}</p>
-<p>Name: ${bank.holder}</p>
-<p>Your request is being processed.</p>
+modal("Enter Amount",`
+<input id="usd" type="number" placeholder="Amount in USD" oninput="convert()">
+<p id="ngn"></p>
+<button class="btn" onclick="processWithdraw()">Withdraw</button>
 `);
 }
 
-function modal(title,msg){
-const o=document.createElement("div");
-o.className="overlay";
-o.innerHTML=`<div class="modal"><h3>${title}</h3><div>${msg}</div><br><button class="btn alt" onclick="this.closest('.overlay').remove()">Close</button></div>`;
-document.body.appendChild(o);
-}
-</script>
-
-<header>
-<h1>Vixly</h1>
-<button class="btn" onclick="logout()">Logout</button>
-</header>
-
-<section id="auth" class="container">
-<div class="card">
-<h2>Create Account</h2>
-<input placeholder="Username">
-<input type="password" placeholder="Password">
-<button class="btn" style="width:100%" onclick="signup()">Sign Up</button>
-</div>
-</section>
-
-<section id="home" class="container hidden">
-<div class="wallet">
-<div>
-<h2>$<span id="bal">0.00</span></h2>
-<div>Wallet Balance</div>
-</div>
-<div>
-<div><strong>Agency code:</strong> 2k6fund</div>
-<button class="btn" onclick="withdraw()">Withdraw</button>
-</div>
-</div>
-
-<div class="video-grid" id="videoGrid"></div>
-</section>
-
-</body>
-</html>
+function convert(){
+const usd=document.getElementById("usd").value||0;
+document.getElementById("ngn").text
