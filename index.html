@@ -69,7 +69,7 @@ z-index:100
 background:#0b1410;
 padding:25px;
 border-radius:14px;
-max-width:360px;
+max-width:340px;
 width:100%;
 text-align:center
 }
@@ -91,22 +91,13 @@ animation:spin 1s linear infinite;
 margin:20px auto
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.check{
-width:70px;height:70px;
-border-radius:50%;
-background:#00ff8c;
-display:flex;align-items:center;justify-content:center;
-font-size:36px;color:#042b1a;
-animation:pop .5s ease
-}
-@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 </style>
 </head>
 
 <body>
 
 <script>
+// floating $
 for(let i=0;i<25;i++){
   const d=document.createElement("div");
   d.className="dollar";
@@ -117,15 +108,15 @@ for(let i=0;i<25;i++){
   document.body.appendChild(d);
 }
 
+// persistent login
 if(localStorage.getItem("vixlyUser")){
   window.onload=()=>{auth.classList.add("hidden");home.classList.remove("hidden");loadVideos()}
 }
 
+// wallet
 let balance=parseFloat(localStorage.getItem("balance")||"0");
-const RATE=1500;
 
-let bank=JSON.parse(localStorage.getItem("bank")||"null");
-
+// daily limit
 const DAILY_LIMIT=20;
 let today=new Date().toDateString();
 let daily=JSON.parse(localStorage.getItem("daily")||"{}");
@@ -134,6 +125,10 @@ if(daily.date!==today){
   localStorage.setItem("daily",JSON.stringify(daily));
 }
 
+// bank storage
+let bank=JSON.parse(localStorage.getItem("bank")||"null");
+
+// titles
 const titles=[
 "How Money Really Works","Side Hustles That Pay",
 "Secrets of Online Income","Why Most People Stay Broke",
@@ -141,6 +136,7 @@ const titles=[
 "How Digital Money Is Made","Financial Habits of Winners"
 ];
 
+// shuffle
 const videos=[...Array(100).keys()].sort(()=>Math.random()-.5);
 let watchedSession=new Set();
 
@@ -207,6 +203,7 @@ document.getElementById("bal").textContent=balance.toFixed(2);
 el.classList.add("watched");
 }
 
+// withdrawal flow
 function withdraw(){
 modal("Choose withdrawal method",`
 <button class="btn" onclick="bankForm()">Add Bank</button><br><br>
@@ -225,7 +222,7 @@ modal("Bank Details",`
 </select>
 <input id="acctNum" placeholder="Account Number">
 <input id="acctName" placeholder="Account Holder Name">
-<button class="btn" onclick="saveBank()">Save & Continue</button>
+<button class="btn" onclick="saveBank()">Save Bank</button>
 `);
 }
 
@@ -236,41 +233,26 @@ number:acctNum.value,
 holder:acctName.value
 };
 localStorage.setItem("bank",JSON.stringify(bank));
-amountForm();
+confirmWithdraw();
 }
 
-function amountForm(){
+function confirmWithdraw(){
 if(balance<500){
 modal("Withdrawal Error","Minimum withdrawal amount is $500");
 return;
 }
-modal("Enter Amount",`
-<input id="usd" type="number" placeholder="Amount in USD" oninput="convert()">
-<p id="ngn"></p>
-<button class="btn" onclick="processWithdraw()">Withdraw</button>
+modal("Withdrawal Submitted",`
+<p>Bank: ${bank.name}</p>
+<p>Account: ${bank.number}</p>
+<p>Name: ${bank.holder}</p>
+<p>Your request is being processed.</p>
 `);
-}
-
-function convert(){
-const usd=document.getElementById("usd").value||0;
-document.getElementById("ngn").textContent=`₦${(usd*RATE).toLocaleString()}`;
-}
-
-function processWithdraw(){
-const o=document.createElement("div");
-o.className="overlay";
-o.innerHTML=`<div class="modal"><div class="loader"></div><p>Processing withdrawal…</p></div>`;
-document.body.appendChild(o);
-
-setTimeout(()=>{
-o.innerHTML=`<div class="modal"><div class="check">✓</div><h3>Successful</h3><p>Your withdrawal is being processed.</p></div>`;
-},10000);
 }
 
 function modal(title,msg){
 const o=document.createElement("div");
 o.className="overlay";
-o.innerHTML=`<div class="modal"><h3>${title}</h3>${msg}<br><br><button class="btn alt" onclick="this.closest('.overlay').remove()">Close</button></div>`;
+o.innerHTML=`<div class="modal"><h3>${title}</h3><div>${msg}</div><br><button class="btn alt" onclick="this.closest('.overlay').remove()">Close</button></div>`;
 document.body.appendChild(o);
 }
 </script>
