@@ -3,239 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vixly – Watch & Earn</title>
+<title>Vixly</title>
 
 <style>
-*{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-body{margin:0;background:#0e1a12;color:#eafff1}
+*{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
+body{margin:0;background:#0e1a12;color:#eafff1;overflow-x:hidden}
 .hidden{display:none}
 
-header{
-background:#0b1410;position:sticky;top:0;z-index:10;
-display:flex;justify-content:space-between;align-items:center;
-padding:14px 18px
-}
+button{cursor:pointer;border:none;border-radius:8px;font-weight:600}
+button:active{transform:scale(.97)}
+
+.fadeIn{animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+
+header{background:#0b1410;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
 header h1{color:#00ff8c;margin:0}
 
-.btn{
-background:#00ff8c;color:#042b1a;border:none;
-padding:10px 16px;border-radius:8px;
-font-weight:600;cursor:pointer;transition:.25s
-}
-.btn:hover{transform:translateY(-2px)}
+.container{padding:18px;max-width:1100px;margin:auto}
 
-.container{padding:18px;max-width:1200px;margin:auto}
+.wallet{background:linear-gradient(135deg,#00ff8c,#00c96d);color:#052b19;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.wallet small{opacity:.7;font-size:12px}
 
-.card{
-background:rgba(255,255,255,.05);
-border-radius:16px;padding:22px;
-max-width:420px;margin:40px auto
-}
+.btn{background:#00ff8c;color:#052b19;padding:10px 16px}
+.btn.alt{background:#1a3a2a;color:#eafff1}
 
-input,select{
-width:100%;padding:12px;margin-top:10px;
-border-radius:8px;border:none
-}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.video{background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;transition:.3s;position:relative}
+.video img{width:100%;display:block}
+.video p{font-size:13px;margin:8px}
+.video:hover{transform:translateY(-4px)}
+.video.watched{filter:blur(3px);pointer-events:none}
 
-.wallet{
-background:linear-gradient(135deg,#00ff8c,#00c96d);
-color:#042b1a;border-radius:16px;
-padding:18px;display:flex;
-justify-content:space-between;align-items:center
-}
+.play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;color:white;background:rgba(0,0,0,.25)}
 
-.video-grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-gap:14px;margin-top:20px
-}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:#0b1410;padding:22px;border-radius:14px;width:92%;max-width:420px}
+.modal h3{margin-top:0;color:#00ff8c}
+input,select{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:none}
 
-.video{
-background:rgba(255,255,255,.06);
-border-radius:12px;overflow:hidden;
-cursor:pointer;transition:.3s;position:relative
-}
-.video:hover{transform:translateY(-6px)}
-.video.watched{filter:blur(3px);opacity:.5;pointer-events:none}
-.video img{width:100%}
-.video .play{
-position:absolute;inset:0;display:flex;
-align-items:center;justify-content:center;
-font-size:36px;color:#00ff8c
-}
-.video p{margin:8px;font-size:13px}
-
-.overlay{
-position:fixed;inset:0;
-background:rgba(0,0,0,.85);
-display:flex;align-items:center;
-justify-content:center;z-index:100
-}
-
-.modal{
-background:#0b1410;border-radius:16px;
-padding:22px;max-width:420px;width:92%
-}
-
-.loader{
-width:70px;height:70px;
-border:6px solid rgba(255,255,255,.2);
-border-top:6px solid #00ff8c;
-border-radius:50%;animation:spin 1s linear infinite;
-margin:20px auto
-}
+.spinner{width:60px;height:60px;border:6px solid rgba(255,255,255,.2);border-top:6px solid #00ff8c;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.check{
-width:80px;height:80px;border-radius:50%;
-background:#00ff8c;color:#042b1a;
-display:flex;align-items:center;justify-content:center;
-font-size:42px;margin:20px auto
-}
+.check{font-size:48px;color:#00ff8c;text-align:center;animation:pop .4s}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1)}}
 
-.history-item{
-background:rgba(255,255,255,.06);
-border-radius:12px;padding:14px;margin-bottom:10px
-}
-.status{font-weight:600}
-.pending{color:#ffc107}
-.success{color:#00ff8c}
+.msg{background:#1a3a2a;padding:10px;border-radius:8px;margin:10px 0;text-align:center}
 
-footer{text-align:center;padding:20px;opacity:.6}
+footer{text-align:center;padding:18px;font-size:12px;opacity:.6}
 </style>
 </head>
+
 <body>
 
 <header>
-<h1>Vixly</h1>
-<div>
-<button class="btn" onclick="openHistory()">History</button>
-<button class="btn" onclick="logout()">Logout</button>
-</div>
+  <h1>Vixly</h1>
+  <button class="btn alt" onclick="logout()">Logout</button>
 </header>
 
-<section id="auth" class="container">
-<div class="card">
-<h2>Sign In</h2>
-<input placeholder="Username">
-<input type="password">
-<button class="btn" style="width:100%;margin-top:10px" onclick="signup()">Sign In</button>
-</div>
-</section>
-
-<section id="home" class="container hidden">
-<div class="wallet">
-<div>
-<h2>$<span id="bal">0.00</span></h2>
-<small>Wallet Balance</small>
-</div>
-<div style="text-align:right">
-<small>Agency code</small><br>
-<strong>2k6fund</strong><br>
-<button class="btn" style="margin-top:6px" onclick="openWithdraw()">Withdraw</button>
-</div>
+<div class="container" id="auth">
+  <div class="modal fadeIn">
+    <h3>Create Account</h3>
+    <input placeholder="Username">
+    <input placeholder="Password" type="password">
+    <button class="btn" style="width:100%" onclick="signup()">Continue</button>
+  </div>
 </div>
 
-<div class="video-grid" id="videoGrid"></div>
-</section>
+<div class="container hidden" id="home">
+  <div class="wallet fadeIn">
+    <div>
+      <h2>$<span id="bal">0.00</span></h2>
+      <small>Wallet Balance</small>
+    </div>
+    <div>
+      <small>Agency code</small><br>
+      <strong>2k6fund</strong><br>
+      <button class="btn alt" onclick="openWithdraw()">Withdraw</button>
+    </div>
+  </div>
 
-<footer>© 2023 Vixly</footer>
+  <h3>Watch Videos & Earn</h3>
+  <small id="limitText"></small>
+  <div class="video-grid" id="grid"></div>
+</div>
+
+<footer>© 2025 Vixly</footer>
 
 <script>
-const RATE=1500;
-let balance=Number(localStorage.getItem('balance')||0);
-let bank=JSON.parse(localStorage.getItem('bankInfo')||'null');
-let history=JSON.parse(localStorage.getItem('history')||'[]');
+/* ---------- STORAGE ---------- */
+const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+const load=k=>JSON.parse(localStorage.getItem(k))
 
-const titles=[
-"How People Are Making Money From Home in 2025",
-"This Simple Habit Changed My Life",
-"What Nobody Tells You About Online Income",
-"Watch This Before You Start a Side Hustle",
-"The Truth About Passive Income",
-"How to Stay Focused in a Distracted World",
-"Daily Motivation You Need Right Now",
-"This Mistake Is Holding You Back",
-"How Successful People Start Their Day",
-"3 Skills That Pay Forever",
-"Smart Ways to Earn Online Without Stress",
-"Why Most People Fail at Making Money Online",
-"Proven Habits of Financially Free People",
-"How to Build Discipline That Lasts",
-"Secrets to Staying Consistent",
-"Why Small Wins Matter More Than You Think",
-"How to Think Like an Entrepreneur",
-"Easy Online Jobs Anyone Can Do",
-"Stop Wasting Time — Do This Instead",
-"How to Improve Your Life in 30 Days",
-"Simple Mindset Shifts for Success",
-"How People Stay Rich Long Term",
-"The Psychology of Success Explained",
-"Daily Routines That Actually Work",
-"Why Action Beats Motivation",
-"How to Create Multiple Income Streams",
-"Focus Tricks That Actually Work",
-"Lessons Successful People Learn Early",
-"How to Avoid Burnout While Hustling",
-"One Decision That Can Change Everything"
-];
+/* ---------- AUTH ---------- */
+if(load("signedIn")){showHome()}
 
-if(localStorage.getItem('accountCreated')) showHome();
-
-function signup(){localStorage.setItem('accountCreated',1);showHome()}
-function logout(){localStorage.clear();location.reload()}
+function signup(){
+  store("signedIn",true)
+  showHome()
+}
+function logout(){
+  localStorage.clear()
+  location.reload()
+}
 function showHome(){
-auth.classList.add('hidden');
-home.classList.remove('hidden');
-bal.textContent=balance.toFixed(2);
-loadVideos();
+  auth.classList.add("hidden")
+  home.classList.remove("hidden")
+  init()
 }
 
-function loadVideos(){
-videoGrid.innerHTML='';
-[...Array(60).keys()].sort(()=>Math.random()-.5).forEach(i=>{
-const v=document.createElement('div');
-v.className='video';
-v.innerHTML=`
-<img src="https://picsum.photos/seed/${i}/400/300">
-<div class="play">▶</div>
-<p>${titles[Math.floor(Math.random()*titles.length)]}</p>`;
-v.onclick=()=>watch(v);
-videoGrid.appendChild(v);
-});
+/* ---------- DATA ---------- */
+let balance=load("bal")||0
+let watched=load("watched")||[]
+let daily=load("daily")||{date:new Date().toDateString(),count:0}
+if(daily.date!==new Date().toDateString())daily={date:new Date().toDateString(),count:0}
+
+const titles=[ /* 50+ titles */
+"How AI Is Changing Online Income","Passive Income Explained",
+"Top Side Hustles in 2025","Crypto Basics for Beginners",
+"Digital Marketing Secrets","How Apps Make Money",
+"Online Jobs That Pay Daily","YouTube Automation Guide",
+"Freelancing From Home","Dropshipping Simplified",
+"How Algorithms Work","Tech Trends This Year",
+"Making Money With Ads","Remote Work Tips",
+"Beginner’s Guide to Investing","Earning With Content",
+"Monetization Strategies","How Streaming Platforms Pay",
+"AI Tools You Should Know","Social Media Growth Hacks",
+"Brand Building Online","What Is Web3?",
+"Online Business Models","Digital Skills That Pay",
+"How Startups Scale","Affiliate Marketing 101",
+"Content Creation Tips","Automation Tools Review",
+"Building Online Assets","Marketing Funnels Explained",
+"Video Monetization","Online Platforms Breakdown",
+"Tech Careers Explained","AI vs Human Jobs",
+"Financial Literacy Basics","Smart Money Habits",
+"Side Income Ideas","Online Branding Guide",
+"Internet Economy","Future of Work",
+"Digital Economy Explained","Earning With Platforms",
+"Online Monetization","Remote Income Streams",
+"Tech Explained Simply","How Platforms Scale",
+"Digital Ads Explained","Modern Internet Business"
+]
+
+titles.sort(()=>Math.random()-.5)
+
+/* ---------- INIT ---------- */
+function init(){
+  bal.textContent=balance.toFixed(2)
+  store("daily",daily)
+  renderVideos()
+  updateLimit()
 }
 
-function watch(el){
-const o=document.createElement('div');
-o.className='overlay';
-o.innerHTML=`<div class="modal"><div class="loader"></div><p>Auto-watching GITBOT6… 40s</p></div>`;
-document.body.appendChild(o);
-setTimeout(()=>{
-o.remove();
-balance+=572;
-localStorage.setItem('balance',balance);
-bal.textContent=balance.toFixed(2);
-el.classList.add('watched');
-},40000);
+/* ---------- VIDEOS ---------- */
+function renderVideos(){
+  grid.innerHTML=""
+  titles.forEach((t,i)=>{
+    const v=document.createElement("div")
+    v.className="video fadeIn"+(watched.includes(i)?" watched":"")
+    v.innerHTML=`
+      <img src="https://picsum.photos/300/200?random=${i}">
+      <div class="play">▶</div>
+      <p>${t}</p>`
+    v.onclick=()=>watch(i)
+    grid.appendChild(v)
+  })
 }
+
+function updateLimit(){
+  limitText.textContent=`${20-daily.count} videos left today`
+}
+
+/* ---------- WATCH ---------- */
+function watch(i){
+  if(daily.count>=20)return popup("Daily limit reached")
+  if(watched.includes(i))return
+
+  showOverlay(`
+    <h3>Auto-watching GITBOT6</h3>
+    <div class="spinner"></div>
+  `)
+
+  setTimeout(()=>{
+    closeOverlay()
+    daily.count++
+    watched.push(i)
+    balance+=0.5
+    store("daily",daily)
+    store("watched",watched)
+    store("bal",balance)
+    init()
+  },40000)
+}
+
+/* ---------- WITHDRAW ---------- */
+let bank=load("bank")||null
 
 function openWithdraw(){
-const o=document.createElement('div');
-o.className='overlay';
-o.innerHTML=`
-<div class="modal">
-<h3>Withdraw</h3>
-<button class="btn" style="width:100%" onclick="openBank()">Bank</button>
-<button class="btn" style="width:100%;margin-top:10px" disabled>Crypto (Unavailable)</button>
-</div>`;
-document.body.appendChild(o);
+  showOverlay(`
+    <h3>Choose Withdrawal Method</h3>
+    <button class="btn" onclick="openBank()">Bank Transfer</button>
+    <button class="btn alt" disabled>Crypto (Unavailable)</button>
+    <button class="btn alt" onclick="closeOverlay()">Back</button>
+  `)
 }
 
 function openBank(){
-if(!bank){
-document.querySelector('.overlay').innerHTML=`
-<div class="modal">
-<select id="b">
+  if(bank){
+    showOverlay(`
+      <h3>Saved Bank</h3>
+      <p>${bank.bank}<br>${bank.name}<br>${bank.acc}</p>
+      <button class="btn" onclick="withdrawAmount()">Continue</button>
+      <button class="btn alt" onclick="closeOverlay()">Back</button>
+    `)
+  }else{
+    showOverlay(`
+      <h3>Add Bank</h3>
+      <select id="b">
   <option value="">Select Bank</option>
 
   <!-- Traditional Banks -->
@@ -249,86 +232,66 @@ document.querySelector('.overlay').innerHTML=`
   <option>Stanbic IBTC</option>
   <option>FCMB</option>
   <option>Ecobank</option>
-
-  <!-- Digital / Fintech -->
   <option>Opay</option>
   <option>Palmpay</option>
   <option>Kuda MFB</option>
 </select>
-<input id="n" placeholder="Account Number">
-<input id="h" placeholder="Account Name">
-<button class="btn" style="width:100%" onclick="saveBank()">Save</button>
-</div>`;
-}else{
-document.querySelector('.overlay').innerHTML=`
-<div class="modal">
-<h3>Confirm Bank</h3>
-<p>${bank.bank}<br>${bank.number}<br>${bank.name}</p>
-<button class="btn" style="width:100%" onclick="withdrawAmount()">Continue</button>
-</div>`;
-}
+      <input id="acc" placeholder="Account Number">
+      <input id="name" placeholder="Account Name">
+      <button class="btn" onclick="saveBank()">Save</button>
+      <button class="btn alt" onclick="closeOverlay()">Back</button>
+    `)
+  }
 }
 
 function saveBank(){
-bank={bank:b.value,number:n.value,name:h.value};
-localStorage.setItem('bankInfo',JSON.stringify(bank));
-document.querySelector('.overlay').innerHTML=`
-<div class="modal">
-<div class="check">✓</div>
-<p style="text-align:center">Bank details saved</p>
-<button class="btn" style="width:100%" onclick="document.querySelector('.overlay').remove()">Done</button>
-</div>`;
+  bank={bank:b.value,acc:acc.value,name:name.value}
+  store("bank",bank)
+  popup("Bank details saved")
+  openBank()
 }
 
 function withdrawAmount(){
-document.querySelector('.overlay').innerHTML=`
-<div class="modal">
-<input id="amt" placeholder="Amount (USD)" oninput="conv()">
-<div id="ngn">≈ ₦0</div>
-<button class="btn" style="width:100%" onclick="finalWithdraw()">Withdraw</button>
-</div>`;
+  showOverlay(`
+    <h3>Withdraw Funds</h3>
+    <input id="amt" placeholder="USD Amount">
+    <p id="ngn"></p>
+    <button class="btn" onclick="processWithdraw()">Withdraw</button>
+    <button class="btn alt" onclick="closeOverlay()">Back</button>
+  `)
+  amt.oninput=()=>ngn.textContent=`₦${(amt.value*1500||0).toLocaleString()}`
 }
 
-function conv(){
-ngn.textContent=`≈ ₦${(amt.value*RATE).toLocaleString()}`;
+function processWithdraw(){
+  if(balance<500)return popup("Minimum withdrawal $500")
+  const a=+amt.value
+  if(a>balance)return popup("Insufficient balance")
+
+  showOverlay(`<div class="spinner"></div>`)
+
+  setTimeout(()=>{
+    balance-=a
+    store("bal",balance)
+    showOverlay(`<div class="check">✔</div><p>Withdrawal Successful</p>`)
+    setTimeout(closeOverlay,2000)
+    init()
+  },7000)
 }
 
-function finalWithdraw(){
-const a=Number(amt.value);
-if(balance<500||a<=0||a>balance)return;
-
-const id="TX"+Date.now();
-history.push({id,bank,usd:a,ngn:a*RATE,status:"Pending"});
-localStorage.setItem('history',JSON.stringify(history));
-
-document.querySelector('.overlay').innerHTML=`<div class="modal"><div class="loader"></div></div>`;
-
-setTimeout(()=>{
-balance-=a;
-history.find(t=>t.id===id).status="Successful";
-localStorage.setItem('history',JSON.stringify(history));
-localStorage.setItem('balance',balance);
-bal.textContent=balance.toFixed(2);
-document.querySelector('.overlay').innerHTML=`<div class="modal"><div class="check">✓</div><p>Withdrawal Successful</p></div>`;
-},7000);
+/* ---------- UI HELPERS ---------- */
+function showOverlay(html){
+  closeOverlay()
+  const o=document.createElement("div")
+  o.className="overlay"
+  o.innerHTML=`<div class="modal fadeIn">${html}</div>`
+  document.body.appendChild(o)
 }
-
-function openHistory(){
-const o=document.createElement('div');
-o.className='overlay';
-o.innerHTML=`
-<div class="modal">
-<h3>Transaction History</h3>
-${history.map(t=>`
-<div class="history-item">
-<strong>${t.id}</strong><br>
-${t.bank.bank} • ${t.bank.number}<br>
-$${t.usd} → ₦${t.ngn.toLocaleString()}<br>
-<span class="status ${t.status==="Pending"?"pending":"success"}">${t.status}</span>
-</div>`).join('')}
-<button class="btn" style="width:100%" onclick="o.remove()">Close</button>
-</div>`;
-document.body.appendChild(o);
+function closeOverlay(){
+  const o=document.querySelector(".overlay")
+  if(o)o.remove()
+}
+function popup(t){
+  showOverlay(`<div class="msg">${t}</div><button class="btn" onclick="closeOverlay()">OK</button>`)
 }
 </script>
 </body>
