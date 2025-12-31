@@ -1,265 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Vixly – Watch & Earn</title>
 
 <style>
-*{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
+*{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
 body{margin:0;background:#0e1a12;color:#eafff1;overflow-x:hidden}
-
-.dollar{position:fixed;color:rgba(0,255,140,.15);animation:float 12s linear infinite;pointer-events:none}
-@keyframes float{from{transform:translateY(100vh)}to{transform:translateY(-10vh)}}
-
-header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;background:#0b1410;position:sticky;top:0;z-index:10}
-header h1{color:#00ff8c;margin:0}
-
-.btn{background:#00ff8c;color:#042b1a;border:none;padding:10px 16px;border-radius:6px;font-weight:600;cursor:pointer}
-.btn.alt{background:#222;color:#fff}
-
-.container{padding:20px;max-width:1200px;margin:auto}
 .hidden{display:none}
 
-.card{background:rgba(255,255,255,.05);border-radius:14px;padding:24px;max-width:420px;margin:60px auto}
+header{position:sticky;top:0;z-index:10;background:#0b1410;
+display:flex;justify-content:space-between;align-items:center;
+padding:14px 18px}
+header h1{color:#00ff8c;margin:0}
+
+.btn{background:#00ff8c;color:#042b1a;border:none;
+padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer;
+transition:.25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+
+.container{padding:18px;max-width:1200px;margin:auto}
+
+.card{background:rgba(255,255,255,.05);border-radius:16px;
+padding:22px;margin:40px auto;max-width:420px}
+
+input,select{
+width:100%;padding:12px;border-radius:8px;border:none;margin-top:10px
+}
 
 .wallet{
 background:linear-gradient(135deg,#00ff8c,#00c96d);
-color:#042b1a;
-border-radius:14px;
-padding:20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-flex-wrap:wrap;
-gap:12px
+color:#042b1a;border-radius:16px;padding:18px;
+display:flex;justify-content:space-between;align-items:center;
+flex-wrap:wrap;gap:12px
 }
 
-.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:20px}
+.wallet small{font-size:12px;opacity:.8}
+
+.video-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+gap:14px;margin-top:20px
+}
 
 .video{
 background:rgba(255,255,255,.06);
-border-radius:10px;
-overflow:hidden;
-cursor:pointer;
-position:relative;
-transition:.3s
+border-radius:12px;overflow:hidden;cursor:pointer;
+transition:.3s;position:relative
 }
-.video:hover{transform:translateY(-5px)}
-.video.watched{filter:blur(4px);pointer-events:none}
-
+.video:hover{transform:translateY(-6px) scale(1.03)}
+.video.watched{filter:blur(3px);opacity:.5;pointer-events:none}
 .video img{width:100%;display:block}
-.video-title{padding:8px;font-size:14px}
-
-.play{
-position:absolute;inset:0;
-display:flex;align-items:center;justify-content:center;
-font-size:38px;color:white;
-background:rgba(0,0,0,.35)
+.video .play{
+position:absolute;inset:0;display:flex;
+align-items:center;justify-content:center;
+font-size:36px;color:#00ff8c;opacity:.9
 }
+.video p{margin:8px;font-size:13px}
 
 .overlay{
-position:fixed;inset:0;
-background:rgba(0,0,0,.85);
-display:flex;align-items:center;justify-content:center;
-z-index:100
+position:fixed;inset:0;background:rgba(0,0,0,.85);
+display:flex;align-items:center;justify-content:center;z-index:100
 }
 
 .modal{
-background:#0b1410;
-padding:25px;
-border-radius:14px;
-max-width:340px;
-width:100%;
-text-align:center
+background:#0b1410;border-radius:16px;
+padding:22px;max-width:420px;width:92%;
+animation:pop .4s cubic-bezier(.22,1,.36,1)
 }
 
-input,select{
-width:100%;
-padding:10px;
-border-radius:6px;
-border:none;
-margin-top:10px
-}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
 
 .loader{
-width:60px;height:60px;
-border:6px solid rgba(255,255,255,.2);
-border-top:6px solid #00ff8c;
-border-radius:50%;
-animation:spin 1s linear infinite;
-margin:20px auto
+width:70px;height:70px;border:6px solid rgba(255,255,255,.2);
+border-top:6px solid #00ff8c;border-radius:50%;
+animation:spin 1s linear infinite;margin:20px auto
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.check{
+width:80px;height:80px;border-radius:50%;
+background:#00ff8c;color:#042b1a;
+display:flex;align-items:center;justify-content:center;
+font-size:42px;margin:20px auto;
+animation:pop .4s cubic-bezier(.22,1,.36,1)
+}
+
+footer{text-align:center;padding:20px;opacity:.6}
 </style>
 </head>
-
 <body>
-
-<script>
-// floating $
-for(let i=0;i<25;i++){
-  const d=document.createElement("div");
-  d.className="dollar";
-  d.textContent="$";
-  d.style.left=Math.random()*100+"vw";
-  d.style.fontSize=14+Math.random()*26+"px";
-  d.style.animationDuration=8+Math.random()*12+"s";
-  document.body.appendChild(d);
-}
-
-// persistent login
-if(localStorage.getItem("vixlyUser")){
-  window.onload=()=>{auth.classList.add("hidden");home.classList.remove("hidden");loadVideos()}
-}
-
-// wallet
-let balance=parseFloat(localStorage.getItem("balance")||"0");
-
-// daily limit
-const DAILY_LIMIT=20;
-let today=new Date().toDateString();
-let daily=JSON.parse(localStorage.getItem("daily")||"{}");
-if(daily.date!==today){
-  daily={date:today,count:0};
-  localStorage.setItem("daily",JSON.stringify(daily));
-}
-
-// bank storage
-let bank=JSON.parse(localStorage.getItem("bank")||"null");
-
-// titles
-const titles=[
-"How Money Really Works","Side Hustles That Pay",
-"Secrets of Online Income","Why Most People Stay Broke",
-"Smart Ways to Build Wealth","Passive Income Explained",
-"How Digital Money Is Made","Financial Habits of Winners"
-];
-
-// shuffle
-const videos=[...Array(100).keys()].sort(()=>Math.random()-.5);
-let watchedSession=new Set();
-
-function signup(){
-localStorage.setItem("vixlyUser","true");
-auth.classList.add("hidden");
-home.classList.remove("hidden");
-loadVideos();
-}
-
-function logout(){
-localStorage.clear();
-location.reload();
-}
-
-function loadVideos(){
-document.getElementById("bal").textContent=balance.toFixed(2);
-const grid=document.getElementById("videoGrid");
-grid.innerHTML="";
-videos.forEach(i=>{
-  const v=document.createElement("div");
-  v.className="video";
-  v.innerHTML=`
-    <img src="https://picsum.photos/seed/${i}/400/250">
-    <div class="play">▶</div>
-    <div class="video-title">${titles[Math.floor(Math.random()*titles.length)]}</div>
-  `;
-  v.onclick=()=>watch(i,v);
-  grid.appendChild(v);
-});
-}
-
-function watch(i,el){
-if(daily.count>=DAILY_LIMIT){
-modal("Daily Limit Reached","20 videos daily.");
-return;
-}
-if(watchedSession.has(i))return;
-
-const o=document.createElement("div");
-o.className="overlay";
-o.innerHTML=`<div class="modal"><div class="loader"></div><p>Watching… 40s</p></div>`;
-document.body.appendChild(o);
-
-let t=40;
-const int=setInterval(()=>{
-t--;
-o.querySelector("p").textContent=`auto-watching… ${t}s`;
-if(t<=0){
-clearInterval(int);
-o.remove();
-reward(i,el);
-}
-},1000);
-}
-
-function reward(i,el){
-watchedSession.add(i);
-daily.count++;
-localStorage.setItem("daily",JSON.stringify(daily));
-balance+=3821;
-localStorage.setItem("balance",balance);
-document.getElementById("bal").textContent=balance.toFixed(2);
-el.classList.add("watched");
-}
-
-// withdrawal flow
-function withdraw(){
-modal("Choose withdrawal method",`
-<button class="btn" onclick="bankForm()">Add Bank</button><br><br>
-<button class="btn alt">Crypto (Not available in your region)</button>
-`);
-}
-
-function bankForm(){
-modal("Bank Details",`
-<select id="bankName">
-<option>Access Bank</option>
-<option>GTBank</option>
-<option>UBA</option>
-<option>Zenith Bank</option>
-<option>First Bank</option>
-<option>Opay</option>
-<option>Palmpay</option>
-<option>FCMB</option>
-<option>Kuda MFB</option>
-</select>
-<input id="acctNum" placeholder="Account Number">
-<input id="acctName" placeholder="Account Name">
-<button class="btn" onclick="saveBank()">Save Bank</button>
-`);
-}
-
-function saveBank(){
-bank={
-name:bankName.value,
-number:acctNum.value,
-holder:acctName.value
-};
-localStorage.setItem("bank",JSON.stringify(bank));
-confirmWithdraw();
-}
-
-function confirmWithdraw(){
-if(balance<500){
-modal("Withdrawal Error","Minimum withdrawal amount $500");
-return;
-}
-modal("Withdrawal Submitted",`
-<p>Bank: ${bank.name}</p>
-<p>Account: ${bank.number}</p>
-<p>Name: ${bank.holder}</p>
-<p>Your request is being processed.</p>
-`);
-}
-
-function modal(title,msg){
-const o=document.createElement("div");
-o.className="overlay";
-o.innerHTML=`<div class="modal"><h3>${title}</h3><div>${msg}</div><br><button class="btn alt" onclick="this.closest('.overlay').remove()">Close</button></div>`;
-document.body.appendChild(o);
-}
-</script>
 
 <header>
 <h1>Vixly</h1>
@@ -268,10 +99,10 @@ document.body.appendChild(o);
 
 <section id="auth" class="container">
 <div class="card">
-<h2>Create Account</h2>
+<h2>Sign In</h2>
 <input placeholder="Username">
 <input type="password" placeholder="Password">
-<button class="btn" style="width:100%" onclick="signup()">Sign Up</button>
+<button class="btn" style="width:100%;margin-top:10px" onclick="signup()">Sign In</button>
 </div>
 </section>
 
@@ -279,16 +110,184 @@ document.body.appendChild(o);
 <div class="wallet">
 <div>
 <h2>$<span id="bal">0.00</span></h2>
-<div>Wallet Balance</div>
+<small>Wallet Balance</small>
 </div>
-<div>
-<div><strong>Agency code:</strong> 2k6fund</div>
-<button class="btn" onclick="withdraw()">Withdraw</button>
+<div style="text-align:right">
+<small>Agency code</small><br>
+<strong>2k6fund</strong><br>
+<button class="btn" style="margin-top:6px" onclick="openWithdraw()">Withdraw</button>
 </div>
 </div>
 
+<h3>Watch Videos & Earn</h3>
 <div class="video-grid" id="videoGrid"></div>
 </section>
 
+<footer>© 2025 Vixly</footer>
+
+<script>
+/* ---------- STATE ---------- */
+const RATE = 1500;
+let balance = Number(localStorage.getItem('balance')||0);
+
+let daily = JSON.parse(localStorage.getItem('dailyWatch')||'{}');
+const today = new Date().toDateString();
+if(daily.date !== today){
+  daily = { date: today, count: 0 };
+}
+localStorage.setItem('dailyWatch', JSON.stringify(daily));
+
+const titles = [
+"How People Are Making Money From Home in 2025",
+"This Simple Habit Changed My Life",
+"What Nobody Tells You About Online Income",
+"Watch This Before You Start a Side Hustle",
+"The Truth About Passive Income",
+"How to Stay Focused in a Distracted World",
+"Daily Motivation You Need Right Now",
+"This Mistake Is Holding You Back",
+"How Successful People Start Their Day",
+"3 Skills That Pay Forever",
+"Smart Ways to Earn Online Without Stress",
+"Why Most People Fail at Making Money Online",
+"Proven Habits of Financially Free People",
+"How to Build Discipline That Lasts",
+"Secrets to Staying Consistent",
+"Why Small Wins Matter More Than You Think",
+"How to Think Like an Entrepreneur",
+"Easy Online Jobs Anyone Can Do",
+"Stop Wasting Time — Do This Instead",
+"How to Improve Your Life in 30 Days",
+"Simple Mindset Shifts for Success",
+"How People Stay Rich Long Term",
+"The Psychology of Success Explained",
+"Daily Routines That Actually Work",
+"Why Action Beats Motivation",
+"How to Create Multiple Income Streams",
+"Focus Tricks That Actually Work",
+"Lessons Successful People Learn Early",
+"How to Avoid Burnout While Hustling",
+"One Decision That Can Change Everything"
+];
+
+/* ---------- AUTH ---------- */
+if(localStorage.getItem('accountCreated')) showHome();
+function signup(){
+localStorage.setItem('accountCreated','1');
+showHome();
+}
+function logout(){localStorage.clear();location.reload()}
+function showHome(){
+document.getElementById('auth').classList.add('hidden');
+document.getElementById('home').classList.remove('hidden');
+document.getElementById('bal').textContent=balance.toFixed(2);
+loadVideos();
+}
+
+/* ---------- VIDEOS ---------- */
+function loadVideos(){
+const grid=document.getElementById('videoGrid');
+grid.innerHTML='';
+let ids=[...Array(100).keys()].sort(()=>Math.random()-.5);
+ids.forEach(i=>{
+const v=document.createElement('div');
+v.className='video';
+const img=document.createElement('img');
+img.src=`https://picsum.photos/seed/${i}/400/300`;
+const p=document.createElement('p');
+p.textContent=titles[Math.floor(Math.random()*titles.length)];
+const play=document.createElement('div');
+play.className='play';play.textContent='▶';
+v.append(img,play,p);
+v.onclick=()=>watchVideo(v);
+grid.appendChild(v);
+});
+}
+
+function watchVideo(el){
+if(daily.count >= 20){
+  alert("Daily limit reached. Come back tomorrow.");
+  return;
+}
+
+const o=document.createElement('div');
+o.className='overlay';
+o.innerHTML=`<div class="modal">
+<div class="loader"></div>
+<p style="text-align:center">Auto-watching with GIT6BOT… 40s</p>
+</div>`;
+document.body.appendChild(o);
+
+let t=40;
+const int=setInterval(()=>{
+t--;
+o.querySelector('p').textContent=`Auto-watching with GIT6BOT… ${t}s`;
+if(t<=0){
+clearInterval(int);
+o.remove();
+daily.count++;
+localStorage.setItem('dailyWatch',JSON.stringify(daily));
+balance+=0.50;
+localStorage.setItem('balance',balance);
+document.getElementById('bal').textContent=balance.toFixed(2);
+el.classList.add('watched');
+}
+},1000);
+}
+
+/* ---------- WITHDRAW ---------- */
+function openWithdraw(){
+const o=document.createElement('div');
+o.className='overlay';
+o.innerHTML=`
+<div class="modal">
+<h3>Choose Withdrawal Method</h3>
+<button class="btn" style="width:100%" onclick="openBank()">Bank</button>
+<button class="btn" style="width:100%;margin-top:10px" disabled>Crypto (Not available)</button>
+<button class="btn" style="width:100%;margin-top:14px;background:#333;color:#fff" onclick="o.remove()">Close</button>
+</div>`;
+document.body.appendChild(o);
+}
+
+function openBank(){
+document.querySelector('.overlay').innerHTML=`
+<div class="modal">
+<h3>Withdraw to Bank</h3>
+<input id="amt" placeholder="Amount (USD)" oninput="convert()">
+<div id="ngn" style="margin-top:6px;font-weight:600">≈ ₦0</div>
+<button class="btn" style="width:100%;margin-top:12px" onclick="finalWithdraw()">Withdraw</button>
+</div>`;
+}
+
+function convert(){
+const v=Number(document.getElementById('amt').value||0);
+document.getElementById('ngn').textContent=`≈ ₦${(v*RATE).toLocaleString()}`;
+}
+
+function finalWithdraw(){
+const amt=Number(document.getElementById('amt').value||0);
+if(balance<500){alert("Minimum withdrawal $500");return;}
+if(amt<=0||amt>balance){alert("Invalid amount");return;}
+
+document.querySelector('.overlay').innerHTML=`
+<div class="modal">
+<div class="loader"></div>
+<p style="text-align:center">Processing withdrawal…</p>
+</div>`;
+
+setTimeout(()=>{
+balance-=amt;
+localStorage.setItem('balance',balance);
+document.getElementById('bal').textContent=balance.toFixed(2);
+document.querySelector('.overlay').innerHTML=`
+<div class="modal">
+<div class="check">✓</div>
+<h3 style="text-align:center">Withdrawal Successful</h3>
+<p style="text-align:center">$${amt} → ₦${(amt*RATE).toLocaleString()}</p>
+<button class="btn" style="width:100%" onclick="document.querySelector('.overlay').remove()">Done</button>
+</div>`;
+},7000);
+}
+</script>
 </body>
 </html>
