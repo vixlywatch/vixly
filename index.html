@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vixly – Watch & Earn</title>
 
 <style>
 *{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-body{margin:0;background:#0e1a12;color:#eafff1;overflow-x:hidden}
+body{margin:0;background:#0e1a12;color:#eafff1}
 .hidden{display:none}
 
-header{position:sticky;top:0;z-index:10;background:#0b1410;
+header{background:#0b1410;position:sticky;top:0;z-index:10;
 display:flex;justify-content:space-between;align-items:center;
 padding:14px 18px}
 header h1{color:#00ff8c;margin:0}
 
-.btn{background:#00ff8c;color:#042b1a;border:none;
-padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer;
-transition:.25s}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.btn{
+background:#00ff8c;color:#042b1a;border:none;
+padding:10px 16px;border-radius:8px;
+font-weight:600;cursor:pointer;transition:.25s
+}
+.btn:hover{transform:translateY(-2px)}
 
 .container{padding:18px;max-width:1200px;margin:auto}
 
-.card{background:rgba(255,255,255,.05);border-radius:16px;
-padding:22px;margin:40px auto;max-width:420px}
+.card{
+background:rgba(255,255,255,.05);
+border-radius:16px;padding:22px;
+max-width:420px;margin:40px auto
+}
 
 input,select{
-width:100%;padding:12px;border-radius:8px;border:none;margin-top:10px
+width:100%;padding:12px;margin-top:10px;
+border-radius:8px;border:none
 }
 
 .wallet{
 background:linear-gradient(135deg,#00ff8c,#00c96d);
-color:#042b1a;border-radius:16px;padding:18px;
-display:flex;justify-content:space-between;align-items:center;
-flex-wrap:wrap;gap:12px
+color:#042b1a;border-radius:16px;
+padding:18px;display:flex;
+justify-content:space-between;align-items:center
 }
-
-.wallet small{font-size:12px;opacity:.8}
+.wallet small{font-size:12px}
 
 .video-grid{
 display:grid;
@@ -46,45 +51,51 @@ gap:14px;margin-top:20px
 
 .video{
 background:rgba(255,255,255,.06);
-border-radius:12px;overflow:hidden;cursor:pointer;
-transition:.3s;position:relative
+border-radius:12px;overflow:hidden;
+cursor:pointer;transition:.3s;position:relative
 }
-.video:hover{transform:translateY(-6px) scale(1.03)}
+.video:hover{transform:translateY(-6px)}
 .video.watched{filter:blur(3px);opacity:.5;pointer-events:none}
-.video img{width:100%;display:block}
+.video img{width:100%}
 .video .play{
-position:absolute;inset:0;display:flex;
-align-items:center;justify-content:center;
-font-size:36px;color:#00ff8c;opacity:.9
+position:absolute;inset:0;
+display:flex;align-items:center;
+justify-content:center;
+font-size:36px;color:#00ff8c
 }
 .video p{margin:8px;font-size:13px}
 
 .overlay{
-position:fixed;inset:0;background:rgba(0,0,0,.85);
-display:flex;align-items:center;justify-content:center;z-index:100
+position:fixed;inset:0;
+background:rgba(0,0,0,.85);
+display:flex;align-items:center;
+justify-content:center;z-index:100
 }
 
 .modal{
-background:#0b1410;border-radius:16px;
-padding:22px;max-width:420px;width:92%;
-animation:pop .4s cubic-bezier(.22,1,.36,1)
+background:#0b1410;
+border-radius:16px;
+padding:22px;
+max-width:420px;width:92%
 }
 
-@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
-
 .loader{
-width:70px;height:70px;border:6px solid rgba(255,255,255,.2);
-border-top:6px solid #00ff8c;border-radius:50%;
-animation:spin 1s linear infinite;margin:20px auto
+width:70px;height:70px;
+border:6px solid rgba(255,255,255,.2);
+border-top:6px solid #00ff8c;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:20px auto
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .check{
-width:80px;height:80px;border-radius:50%;
+width:80px;height:80px;
+border-radius:50%;
 background:#00ff8c;color:#042b1a;
-display:flex;align-items:center;justify-content:center;
-font-size:42px;margin:20px auto;
-animation:pop .4s cubic-bezier(.22,1,.36,1)
+display:flex;align-items:center;
+justify-content:center;
+font-size:42px;margin:20px auto
 }
 
 footer{text-align:center;padding:20px;opacity:.6}
@@ -129,15 +140,27 @@ footer{text-align:center;padding:20px;opacity:.6}
 /* ---------- STATE ---------- */
 const RATE = 1500;
 let balance = Number(localStorage.getItem('balance')||0);
+let bank = JSON.parse(localStorage.getItem('bankInfo')||'null');
 
 let daily = JSON.parse(localStorage.getItem('dailyWatch')||'{}');
 const today = new Date().toDateString();
-if(daily.date !== today){
-  daily = { date: today, count: 0 };
-}
-localStorage.setItem('dailyWatch', JSON.stringify(daily));
+if(daily.date!==today){daily={date:today,count:0}}
+localStorage.setItem('dailyWatch',JSON.stringify(daily));
 
-const titles = [
+/* ---------- AUTH ---------- */
+if(localStorage.getItem('accountCreated')) showHome();
+function signup(){localStorage.setItem('accountCreated','1');showHome()}
+function logout(){localStorage.clear();location.reload()}
+function showHome(){
+document.getElementById('auth').classList.add('hidden');
+document.getElementById('home').classList.remove('hidden');
+document.getElementById('bal').textContent=balance.toFixed(2);
+loadVideos();
+}
+
+/* ---------- VIDEOS ---------- */
+function loadVideos(){
+const titles=[ /* same 30+ titles as before */ 
 "How People Are Making Money From Home in 2025",
 "This Simple Habit Changed My Life",
 "What Nobody Tells You About Online Income",
@@ -169,65 +192,35 @@ const titles = [
 "How to Avoid Burnout While Hustling",
 "One Decision That Can Change Everything"
 ];
-
-/* ---------- AUTH ---------- */
-if(localStorage.getItem('accountCreated')) showHome();
-function signup(){
-localStorage.setItem('accountCreated','1');
-showHome();
-}
-function logout(){localStorage.clear();location.reload()}
-function showHome(){
-document.getElementById('auth').classList.add('hidden');
-document.getElementById('home').classList.remove('hidden');
-document.getElementById('bal').textContent=balance.toFixed(2);
-loadVideos();
-}
-
-/* ---------- VIDEOS ---------- */
-function loadVideos(){
 const grid=document.getElementById('videoGrid');
 grid.innerHTML='';
-let ids=[...Array(100).keys()].sort(()=>Math.random()-.5);
-ids.forEach(i=>{
+[...Array(100).keys()].sort(()=>Math.random()-.5).forEach(i=>{
 const v=document.createElement('div');
 v.className='video';
-const img=document.createElement('img');
-img.src=`https://picsum.photos/seed/${i}/400/300`;
-const p=document.createElement('p');
-p.textContent=titles[Math.floor(Math.random()*titles.length)];
-const play=document.createElement('div');
-play.className='play';play.textContent='▶';
-v.append(img,play,p);
+v.innerHTML=`
+<img src="https://picsum.photos/seed/${i}/400/300">
+<div class="play">▶</div>
+<p>${titles[Math.floor(Math.random()*titles.length)]}</p>`;
 v.onclick=()=>watchVideo(v);
 grid.appendChild(v);
 });
 }
 
 function watchVideo(el){
-if(daily.count >= 20){
-  alert("Daily limit reached. Come back tomorrow.");
-  return;
-}
-
+if(daily.count>=20){alert("Daily limit reached");return;}
 const o=document.createElement('div');
 o.className='overlay';
-o.innerHTML=`<div class="modal">
-<div class="loader"></div>
-<p style="text-align:center">Auto-watching with GIT6BOT… 40s</p>
-</div>`;
+o.innerHTML=`<div class="modal"><div class="loader"></div><p style="text-align:center">Watching… 40s</p></div>`;
 document.body.appendChild(o);
-
 let t=40;
 const int=setInterval(()=>{
 t--;
-o.querySelector('p').textContent=`Auto-watching with GIT6BOT… ${t}s`;
 if(t<=0){
 clearInterval(int);
 o.remove();
 daily.count++;
 localStorage.setItem('dailyWatch',JSON.stringify(daily));
-balance+=0.50;
+balance+=572;
 localStorage.setItem('balance',balance);
 document.getElementById('bal').textContent=balance.toFixed(2);
 el.classList.add('watched');
@@ -244,24 +237,52 @@ o.innerHTML=`
 <h3>Choose Withdrawal Method</h3>
 <button class="btn" style="width:100%" onclick="openBank()">Bank</button>
 <button class="btn" style="width:100%;margin-top:10px" disabled>Crypto (Not available)</button>
-<button class="btn" style="width:100%;margin-top:14px;background:#333;color:#fff" onclick="o.remove()">Close</button>
+<button class="btn" style="width:100%;margin-top:12px;background:#333;color:#fff" onclick="o.remove()">Close</button>
 </div>`;
 document.body.appendChild(o);
 }
 
 function openBank(){
+if(!bank){
 document.querySelector('.overlay').innerHTML=`
 <div class="modal">
-<h3>Withdraw to Bank</h3>
+<h3>Add Bank Details</h3>
+<select id="bankName">
+<option>Access Bank</option><option>GTBank</option>
+<option>UBA</option><option>First Bank</option>
+<option>Zenith Bank</option>
+</select>
+<input id="acctNum" placeholder="Account Number">
+<input id="acctName" placeholder="Account Holder Name">
+<button class="btn" style="width:100%;margin-top:12px" onclick="saveBank()">Save Bank Details</button>
+</div>`;
+}else{withdrawAmount();}
+}
+
+function saveBank(){
+bank={
+bank:bankName.value,
+number:acctNum.value,
+name:acctName.value
+};
+localStorage.setItem('bankInfo',JSON.stringify(bank));
+alert("Bank details saved successfully");
+document.querySelector('.overlay').remove();
+}
+
+function withdrawAmount(){
+document.querySelector('.overlay').innerHTML=`
+<div class="modal">
+<h3>Withdraw to ${bank.bank}</h3>
 <input id="amt" placeholder="Amount (USD)" oninput="convert()">
-<div id="ngn" style="margin-top:6px;font-weight:600">≈ ₦0</div>
+<div id="ngn">≈ ₦0</div>
 <button class="btn" style="width:100%;margin-top:12px" onclick="finalWithdraw()">Withdraw</button>
 </div>`;
 }
 
 function convert(){
-const v=Number(document.getElementById('amt').value||0);
-document.getElementById('ngn').textContent=`≈ ₦${(v*RATE).toLocaleString()}`;
+document.getElementById('ngn').textContent=
+"≈ ₦"+(Number(amt.value||0)*RATE).toLocaleString();
 }
 
 function finalWithdraw(){
@@ -269,18 +290,15 @@ const amt=Number(document.getElementById('amt').value||0);
 if(balance<500){alert("Minimum withdrawal $500");return;}
 if(amt<=0||amt>balance){alert("Invalid amount");return;}
 
-document.querySelector('.overlay').innerHTML=`
-<div class="modal">
-<div class="loader"></div>
-<p style="text-align:center">Processing withdrawal…</p>
-</div>`;
+document.querySelector('.overlay').innerHTML=
+`<div class="modal"><div class="loader"></div><p style="text-align:center">Processing…</p></div>`;
 
 setTimeout(()=>{
 balance-=amt;
 localStorage.setItem('balance',balance);
 document.getElementById('bal').textContent=balance.toFixed(2);
-document.querySelector('.overlay').innerHTML=`
-<div class="modal">
+document.querySelector('.overlay').innerHTML=
+`<div class="modal">
 <div class="check">✓</div>
 <h3 style="text-align:center">Withdrawal Successful</h3>
 <p style="text-align:center">$${amt} → ₦${(amt*RATE).toLocaleString()}</p>
