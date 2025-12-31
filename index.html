@@ -10,9 +10,11 @@
 body{margin:0;background:#0e1a12;color:#eafff1}
 .hidden{display:none}
 
-header{background:#0b1410;position:sticky;top:0;z-index:10;
+header{
+background:#0b1410;position:sticky;top:0;z-index:10;
 display:flex;justify-content:space-between;align-items:center;
-padding:14px 18px}
+padding:14px 18px
+}
 header h1{color:#00ff8c;margin:0}
 
 .btn{
@@ -41,7 +43,6 @@ color:#042b1a;border-radius:16px;
 padding:18px;display:flex;
 justify-content:space-between;align-items:center
 }
-.wallet small{font-size:12px}
 
 .video-grid{
 display:grid;
@@ -58,9 +59,8 @@ cursor:pointer;transition:.3s;position:relative
 .video.watched{filter:blur(3px);opacity:.5;pointer-events:none}
 .video img{width:100%}
 .video .play{
-position:absolute;inset:0;
-display:flex;align-items:center;
-justify-content:center;
+position:absolute;inset:0;display:flex;
+align-items:center;justify-content:center;
 font-size:36px;color:#00ff8c
 }
 .video p{margin:8px;font-size:13px}
@@ -73,30 +73,33 @@ justify-content:center;z-index:100
 }
 
 .modal{
-background:#0b1410;
-border-radius:16px;
-padding:22px;
-max-width:420px;width:92%
+background:#0b1410;border-radius:16px;
+padding:22px;max-width:420px;width:92%
 }
 
 .loader{
 width:70px;height:70px;
 border:6px solid rgba(255,255,255,.2);
 border-top:6px solid #00ff8c;
-border-radius:50%;
-animation:spin 1s linear infinite;
+border-radius:50%;animation:spin 1s linear infinite;
 margin:20px auto
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .check{
-width:80px;height:80px;
-border-radius:50%;
+width:80px;height:80px;border-radius:50%;
 background:#00ff8c;color:#042b1a;
-display:flex;align-items:center;
-justify-content:center;
+display:flex;align-items:center;justify-content:center;
 font-size:42px;margin:20px auto
 }
+
+.history-item{
+background:rgba(255,255,255,.06);
+border-radius:12px;padding:14px;margin-bottom:10px
+}
+.status{font-weight:600}
+.pending{color:#ffc107}
+.success{color:#00ff8c}
 
 footer{text-align:center;padding:20px;opacity:.6}
 </style>
@@ -105,14 +108,17 @@ footer{text-align:center;padding:20px;opacity:.6}
 
 <header>
 <h1>Vixly</h1>
+<div>
+<button class="btn" onclick="openHistory()">History</button>
 <button class="btn" onclick="logout()">Logout</button>
+</div>
 </header>
 
 <section id="auth" class="container">
 <div class="card">
 <h2>Sign In</h2>
 <input placeholder="Username">
-<input type="password" placeholder="Password">
+<input type="password">
 <button class="btn" style="width:100%;margin-top:10px" onclick="signup()">Sign In</button>
 </div>
 </section>
@@ -130,37 +136,18 @@ footer{text-align:center;padding:20px;opacity:.6}
 </div>
 </div>
 
-<h3>Watch Videos & Earn</h3>
 <div class="video-grid" id="videoGrid"></div>
 </section>
 
-<footer>© 2025 Vixly</footer>
+<footer>© 2023 Vixly</footer>
 
 <script>
-/* ---------- STATE ---------- */
-const RATE = 1500;
-let balance = Number(localStorage.getItem('balance')||0);
-let bank = JSON.parse(localStorage.getItem('bankInfo')||'null');
+const RATE=1500;
+let balance=Number(localStorage.getItem('balance')||0);
+let bank=JSON.parse(localStorage.getItem('bankInfo')||'null');
+let history=JSON.parse(localStorage.getItem('history')||'[]');
 
-let daily = JSON.parse(localStorage.getItem('dailyWatch')||'{}');
-const today = new Date().toDateString();
-if(daily.date!==today){daily={date:today,count:0}}
-localStorage.setItem('dailyWatch',JSON.stringify(daily));
-
-/* ---------- AUTH ---------- */
-if(localStorage.getItem('accountCreated')) showHome();
-function signup(){localStorage.setItem('accountCreated','1');showHome()}
-function logout(){localStorage.clear();location.reload()}
-function showHome(){
-document.getElementById('auth').classList.add('hidden');
-document.getElementById('home').classList.remove('hidden');
-document.getElementById('bal').textContent=balance.toFixed(2);
-loadVideos();
-}
-
-/* ---------- VIDEOS ---------- */
-function loadVideos(){
-const titles=[ /* same 30+ titles as before */ 
+const titles=[
 "How People Are Making Money From Home in 2025",
 "This Simple Habit Changed My Life",
 "What Nobody Tells You About Online Income",
@@ -192,52 +179,54 @@ const titles=[ /* same 30+ titles as before */
 "How to Avoid Burnout While Hustling",
 "One Decision That Can Change Everything"
 ];
-const grid=document.getElementById('videoGrid');
-grid.innerHTML='';
-[...Array(100).keys()].sort(()=>Math.random()-.5).forEach(i=>{
+
+if(localStorage.getItem('accountCreated')) showHome();
+
+function signup(){localStorage.setItem('accountCreated',1);showHome()}
+function logout(){localStorage.clear();location.reload()}
+function showHome(){
+auth.classList.add('hidden');
+home.classList.remove('hidden');
+bal.textContent=balance.toFixed(2);
+loadVideos();
+}
+
+function loadVideos(){
+videoGrid.innerHTML='';
+[...Array(60).keys()].sort(()=>Math.random()-.5).forEach(i=>{
 const v=document.createElement('div');
 v.className='video';
 v.innerHTML=`
 <img src="https://picsum.photos/seed/${i}/400/300">
 <div class="play">▶</div>
 <p>${titles[Math.floor(Math.random()*titles.length)]}</p>`;
-v.onclick=()=>watchVideo(v);
-grid.appendChild(v);
+v.onclick=()=>watch(v);
+videoGrid.appendChild(v);
 });
 }
 
-function watchVideo(el){
-if(daily.count>=20){alert("Daily limit reached");return;}
+function watch(el){
 const o=document.createElement('div');
 o.className='overlay';
-o.innerHTML=`<div class="modal"><div class="loader"></div><p style="text-align:center">Watching… 40s</p></div>`;
+o.innerHTML=`<div class="modal"><div class="loader"></div><p>Auto-watching GITBOT6… 40s</p></div>`;
 document.body.appendChild(o);
-let t=40;
-const int=setInterval(()=>{
-t--;
-if(t<=0){
-clearInterval(int);
+setTimeout(()=>{
 o.remove();
-daily.count++;
-localStorage.setItem('dailyWatch',JSON.stringify(daily));
 balance+=572;
 localStorage.setItem('balance',balance);
-document.getElementById('bal').textContent=balance.toFixed(2);
+bal.textContent=balance.toFixed(2);
 el.classList.add('watched');
-}
-},1000);
+},40000);
 }
 
-/* ---------- WITHDRAW ---------- */
 function openWithdraw(){
 const o=document.createElement('div');
 o.className='overlay';
 o.innerHTML=`
 <div class="modal">
-<h3>Choose Withdrawal Method</h3>
+<h3>Withdraw</h3>
 <button class="btn" style="width:100%" onclick="openBank()">Bank</button>
-<button class="btn" style="width:100%;margin-top:10px" disabled>Crypto (Not available)</button>
-<button class="btn" style="width:100%;margin-top:12px;background:#333;color:#fff" onclick="o.remove()">Close</button>
+<button class="btn" style="width:100%;margin-top:10px" disabled>Crypto (Unavailable)</button>
 </div>`;
 document.body.appendChild(o);
 }
@@ -246,65 +235,100 @@ function openBank(){
 if(!bank){
 document.querySelector('.overlay').innerHTML=`
 <div class="modal">
-<h3>Add Bank Details</h3>
-<select id="bankName">
-<option>Access Bank</option><option>GTBank</option>
-<option>UBA</option><option>First Bank</option>
-<option>Zenith Bank</option>
+<select id="b">
+  <option value="">Select Bank</option>
+
+  <!-- Traditional Banks -->
+  <option>Access Bank</option>
+  <option>GTBank</option>
+  <option>First Bank</option>
+  <option>UBA</option>
+  <option>Zenith Bank</option>
+  <option>Union Bank</option>
+  <option>Fidelity Bank</option>
+  <option>Stanbic IBTC</option>
+  <option>FCMB</option>
+  <option>Ecobank</option>
+
+  <!-- Digital / Fintech -->
+  <option>Opay</option>
+  <option>Palmpay</option>
+  <option>Kuda MFB</option>
 </select>
-<input id="acctNum" placeholder="Account Number">
-<input id="acctName" placeholder="Account Holder Name">
-<button class="btn" style="width:100%;margin-top:12px" onclick="saveBank()">Save Bank Details</button>
+<input id="n" placeholder="Account Number">
+<input id="h" placeholder="Account Name">
+<button class="btn" style="width:100%" onclick="saveBank()">Save</button>
 </div>`;
-}else{withdrawAmount();}
+}else{
+document.querySelector('.overlay').innerHTML=`
+<div class="modal">
+<h3>Confirm Bank</h3>
+<p>${bank.bank}<br>${bank.number}<br>${bank.name}</p>
+<button class="btn" style="width:100%" onclick="withdrawAmount()">Continue</button>
+</div>`;
+}
 }
 
 function saveBank(){
-bank={
-bank:bankName.value,
-number:acctNum.value,
-name:acctName.value
-};
+bank={bank:b.value,number:n.value,name:h.value};
 localStorage.setItem('bankInfo',JSON.stringify(bank));
-alert("Bank details saved successfully");
-document.querySelector('.overlay').remove();
+document.querySelector('.overlay').innerHTML=`
+<div class="modal">
+<div class="check">✓</div>
+<p style="text-align:center">Bank details saved</p>
+<button class="btn" style="width:100%" onclick="document.querySelector('.overlay').remove()">Done</button>
+</div>`;
 }
 
 function withdrawAmount(){
 document.querySelector('.overlay').innerHTML=`
 <div class="modal">
-<h3>Withdraw to ${bank.bank}</h3>
-<input id="amt" placeholder="Amount (USD)" oninput="convert()">
+<input id="amt" placeholder="Amount (USD)" oninput="conv()">
 <div id="ngn">≈ ₦0</div>
-<button class="btn" style="width:100%;margin-top:12px" onclick="finalWithdraw()">Withdraw</button>
+<button class="btn" style="width:100%" onclick="finalWithdraw()">Withdraw</button>
 </div>`;
 }
 
-function convert(){
-document.getElementById('ngn').textContent=
-"≈ ₦"+(Number(amt.value||0)*RATE).toLocaleString();
+function conv(){
+ngn.textContent=`≈ ₦${(amt.value*RATE).toLocaleString()}`;
 }
 
 function finalWithdraw(){
-const amt=Number(document.getElementById('amt').value||0);
-if(balance<500){alert("Minimum withdrawal $500");return;}
-if(amt<=0||amt>balance){alert("Invalid amount");return;}
+const a=Number(amt.value);
+if(balance<500||a<=0||a>balance)return;
 
-document.querySelector('.overlay').innerHTML=
-`<div class="modal"><div class="loader"></div><p style="text-align:center">Processing…</p></div>`;
+const id="TX"+Date.now();
+history.push({id,bank,usd:a,ngn:a*RATE,status:"Pending"});
+localStorage.setItem('history',JSON.stringify(history));
+
+document.querySelector('.overlay').innerHTML=`<div class="modal"><div class="loader"></div></div>`;
 
 setTimeout(()=>{
-balance-=amt;
+balance-=a;
+history.find(t=>t.id===id).status="Successful";
+localStorage.setItem('history',JSON.stringify(history));
 localStorage.setItem('balance',balance);
-document.getElementById('bal').textContent=balance.toFixed(2);
-document.querySelector('.overlay').innerHTML=
-`<div class="modal">
-<div class="check">✓</div>
-<h3 style="text-align:center">Withdrawal Successful</h3>
-<p style="text-align:center">$${amt} → ₦${(amt*RATE).toLocaleString()}</p>
-<button class="btn" style="width:100%" onclick="document.querySelector('.overlay').remove()">Done</button>
-</div>`;
+bal.textContent=balance.toFixed(2);
+document.querySelector('.overlay').innerHTML=`<div class="modal"><div class="check">✓</div><p>Withdrawal Successful</p></div>`;
 },7000);
+}
+
+function openHistory(){
+const o=document.createElement('div');
+o.className='overlay';
+o.innerHTML=`
+<div class="modal">
+<h3>Transaction History</h3>
+${history.map(t=>`
+<div class="history-item">
+<strong>${t.id}</strong><br>
+${t.bank.bank} • ${t.bank.number}<br>
+$${t.usd} → ₦${t.ngn.toLocaleString()}<br>
+<span class="status ${t.status==="Pending"?"pending":"success"}">${t.status}</span>
+</div>`).join('')}
+<button class="btn" style="width:100%" onclick="o.remove()">Close</button>
+</div>`;
+document.body.appendChild(o);
 }
 </script>
 </body>
